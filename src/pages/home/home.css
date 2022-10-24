@@ -1,0 +1,47 @@
+.home-back {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+.sclink {
+    width: 450px;
+    height: 400px;
+    background-image: url('https://i.pinimg.com/originals/63/dd/5d/63dd5d40d688b2783f9db941827f6590.gif');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px 2px rgb(225, 225, 255);
+    border-radius:  30px 0 80px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.sclink:hover {
+    filter: brightness(95%);
+}
+.sclink:hover h1 {
+    transform: rotate(30deg) translateX(120px) scale(1.1);
+}
+.sclink h1 {
+    font-size: 2.6rem;
+    color: rgb(18, 74, 255);
+    transition: all 0.2s ease-in-out;
+    transform-origin: center center;
+    transform: rotate(30deg) translateX(120px);
+}
+.auth {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+.auth .link {
+    width: 150px;
+    height: 50px;
+    font-size: 1.2rem;
+    text-shadow: none;
+}
