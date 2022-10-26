@@ -20,7 +20,11 @@ export function EmailVerificationForm() {
     const [email, setEmail] = useState('');
 
     const handleInput = (e: any) => {
-        setEmail(e.target.value);
+        let value: string = e.target.value;
+        if (value.endsWith(suffix)) {
+            value = value.slice(0, value.indexOf(suffix));
+        }
+        setEmail(value);
         setError('');
     }
 
@@ -178,18 +182,9 @@ export function ProfileCreationForm() {
 }
 
 function SignUpPage() {
-    // after email verification
-    const profileCreationForm = useOutlet();
-
+    const outlet = useOutlet();
     return (
-        <>
-        { profileCreationForm
-        ? 
-            profileCreationForm
-        :
-            <EmailVerificationForm />
-        }
-        </>
+        outlet
     );
 }
 

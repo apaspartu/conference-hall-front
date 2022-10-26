@@ -9,3 +9,7 @@ export function validateEmail(email: string): string | false {
 export function saveAccessToken(token: string) {
     localStorage.setItem('accessToken', token);
 }
+
+export function logout() {
+  localStorage.removeItem('accessToken');
+}

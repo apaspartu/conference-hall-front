@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import 'antd/dist/antd.css';
 import './styles/sign-in.css';
@@ -7,7 +7,8 @@ import {Button, Input, Divider, Alert, Result} from 'antd';
 import { Link } from 'react-router-dom';
 import { saveAccessToken, validateEmail } from './helpers';
 import { motion } from 'framer-motion';
-import { signIn } from './api';
+import { refreshSession, signIn } from './api';
+import { Navigate } from 'react-router-dom';
 
 export function SignInPage() {
     const suffix = '@fivesysdev.com'
@@ -18,8 +19,17 @@ export function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+         return <Navigate to='/schedule' replace={true}/>;
+    }
+
     const handleEmailInput = (e: any) => {
-        setEmail(e.target.value);
+        let value: string = e.target.value;
+        if (value.endsWith(suffix)) {
+            value = value.slice(0, value.indexOf(suffix));
+        }
+        setEmail(value);
         setError('');
     }
 
@@ -33,11 +43,12 @@ export function SignInPage() {
         if (validated) {
             setStatus('sent');
             signIn(validated, password)
-            .then((res) => {
+            .then((res: any) => {
+                console.log(res)
                 if (res.accessToken) {
                     setStatus('confirmed');
-                    saveAccessToken(res.accesToken);
-                    window.location.replace("http://localhost:3000/schedule");
+                    saveAccessToken(res.accessToken);
+                    return <Navigate to='/schedule' replace={true}/>;
                 } else {
                     setStatus('typing')
                     if (res.message === 'Not Found') {

@@ -6,8 +6,8 @@ import './home.css';
 function HomePage() {
     return (
         <div className='home-back'>
-            <Link to='/schedule'>
-                <div className='sclink'>
+            <Link to='/schedule' className='sclink'>
+                <div>
                     <h1>Schedule</h1>
                 </div>
             </Link>

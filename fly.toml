@@ -1,4 +1,4 @@
-# fly.toml file generated for conference-hall on 2022-10-24T16:31:45+03:00
+# fly.toml file generated for conference-hall on 2022-10-26T10:18:05+03:00
 
 app = "conference-hall"
 kill_signal = "SIGINT"
