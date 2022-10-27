@@ -50,18 +50,17 @@ export function SignInPage() {
                     saveAccessToken(res.accessToken);
                     return <Navigate to='/schedule' replace={true}/>;
                 } else {
-                    setStatus('typing')
-                    if (res.message === 'Not Found') {
-                        setError('Incorrect email');
-                    } else {
-                        setError(res.message);
-                    }
+                    setError(res.message);
                 }
             })
             .catch((e) => {
+                if (e.response.data.message === 'Not Found') {
+                    setError('Incorrect email');
+                } else {
+                    setError('Something went wrong! Please, check your connection, refresh the page or try again later');
+                }
                 setStatus('typing');
                 console.log(e)
-                setError('Something went wrong! Please, check your connection, refresh the page or try again later');
             })
         } else {
             setError('Invalid email');

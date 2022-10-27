@@ -1,14 +1,14 @@
 import axios from "axios";
 
 // dev
-// const ORIGIN = 'http://localhost:8080'
+const ORIGIN = 'http://localhost:8080'
 
 // prod
-const ORIGIN = 'https://conferense-hall.fly.dev'
+// const ORIGIN = 'https://conferense-hall.fly.dev'
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = ORIGIN;
-axios.defaults.headers['Content-Type'] = 'application/json'
+axios.defaults.headers.common['Content-Type'] = 'application/json'
 
 interface ErrorInterface {
     error: string;
@@ -17,34 +17,18 @@ interface ErrorInterface {
 }
 
 export async function verifyEmail(email: string): Promise<true | ErrorInterface> {
-    const response = await fetch(ORIGIN + '/auth/verify-email', {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-            'Origin': ORIGIN
-        },
-        body: JSON.stringify({email: email})
-    })
-    return response.json();
+    const response = await axios.post(ORIGIN + '/auth/verify-email', {email: email})
+    return response.data;
 }
 
 export async function createProfile(name: string, password: string, inviteToken: string) {
-    const response = await fetch(ORIGIN + '/auth/create-user', {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-            'Origin': ORIGIN
-        },
-        body: JSON.stringify({
+    const response = await axios.post(ORIGIN + '/auth/create-user', {
             name: name,
             password: password,
             inviteToken: inviteToken
-        })
         
     })
-    return response.json();
+    return response.data;
 }
 
 export async function signIn(email: string, password: string) {
@@ -56,12 +40,20 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function refreshSession(): Promise<boolean> {
-    let response: {accessToken: string} & {error: string};
-    try {
-        response = await (await axios.post('/auth/refresh')).data;
-    } catch(e) {
-        localStorage.removeItem('accessToken');
+    if (localStorage.getItem('accessToken') === undefined) {
+        window.location.replace('/sign-in')
         return false;
+    }
+    let response: {accessToken: string};
+    try {
+        response = (await axios.post('/auth/refresh')).data;
+    } catch(e) {
+        if (e.response.statusText === 'Forbidden') {
+            localStorage.removeItem('accessToken');
+            return false;
+        } else {
+            throw e;
+        }
     }
 
     if (response.accessToken) {
@@ -110,34 +102,64 @@ export async function resetPassword(resetToken: string, newPassword: string) {
     return response.json()
 }
 
-export async function profileLoader() {
-    let response;
+// private
+export async function updateProfile(name: string) {
+    const data = await requestPrivate(() => axios.patch('/profile/update', {
+            name: name
+        }, {
+            headers: {'Authorization':  'Bearer ' + localStorage.getItem('accessToken'),}
+        }
+    ))
+    return data;
+
+}
+// private
+export async function changePassword(oldPassword: string, newPassword: string) {
+    const data = await requestPrivate(() => axios.patch('/profile/change-password', {
+            oldPassword,
+            newPassword
+        }, {
+            headers: {'Authorization':  'Bearer ' + localStorage.getItem('accessToken'),}
+        }
+    ))
+    return data;
+
+}
+
+export interface ProfileInfo {
+    name: string;
+    email: string;
+}
+
+export async function loadProfile() {
+    let data;
     try {
-        response = await fetch('/profile', {
-            method: 'GET',
-            headers: {
-                'Origin': ORIGIN,
-                'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
-            },
-        });
-        
-    } catch (e: any) {
-        console.log(e.request.status);
-        if (e.request.status === 403) {
-            const refreshed = await refreshSession();
-            if (refreshed) {
-                response = await fetch('/profile', {
-                    method: 'GET',
-                    headers: {
-                        'Origin': ORIGIN,
-                        'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),
-                    },
-                });
-                return response.json();
+        data = await requestPrivate(() => axios.get('/profile', {
+            headers: {'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),}
+        }));
+    } catch(e) {
+        return window.location.replace('/sign-in')
+    }
+    return data;
+
+}
+
+// try async func with fetch, if forbidden, refresh session and try again, if again forbidden redirect on sign-in
+export async function requestPrivate(func: Function) {
+    try { // if accessToken was not expired
+        const response = await func();
+        return response.data;
+    } catch (e) { // if it was expired
+        if (e.response.statusText === 'Forbidden') {
+            if (await refreshSession() === true) {
+                const response = await func();
+                return response.data;
             } else {
-                throw new Error('Forbidden resource');
+                throw e;
             }
+        } else {
+            localStorage.removeItem('accessToken')
+            throw e;
         }
     }
-    return response?.json();
 }

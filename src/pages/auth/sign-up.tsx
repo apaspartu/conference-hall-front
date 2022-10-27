@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { useOutlet, useParams } from 'react-router-dom';
+import { useNavigate, useOutlet, useParams } from 'react-router-dom';
 
 import 'antd/dist/antd.css';
 import './styles/verify-email.css';
@@ -93,6 +93,7 @@ export function EmailVerificationForm() {
 }
 
 export function ProfileCreationForm() {
+    const navigate = useNavigate();
     const inviteToken = useParams().inviteToken;
 
     if (inviteToken === undefined) {
@@ -129,7 +130,7 @@ export function ProfileCreationForm() {
                     setStatus('confirmed');
                     saveAccessToken(res.accesToken);
                     setTimeout(() => {
-                        window.location.replace("http://localhost:3000/schedule");
+                        navigate('/schedule');
                     }, 1500);
                 } else {
                     setStatus('typing')
