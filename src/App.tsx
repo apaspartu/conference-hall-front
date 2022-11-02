@@ -8,8 +8,8 @@ import HomePage from './pages/home/home';
 import ResetPasswordPage from './pages/auth/reset-password';
 import ForgotPasswordPage from './pages/auth/forgot-password';
 import ProfilePage from './pages/profile/profile';
-import { loadProfile, profileLoader } from './pages/auth/api';
-import Schedule from './pages/schedule/schedule';
+import { loadProfile } from './pages/auth/api';
+import SchedulePage from './pages/schedule-page/schedule-page';
 
 const router = createBrowserRouter([
     {
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/schedule',
-        element: <Schedule />
+        element: <SchedulePage />
     },
     {
         path: 'profile',

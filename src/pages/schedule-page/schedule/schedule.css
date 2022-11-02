@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins');
+
+.sspinner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sspinner img {
+    width: 72px;
+    height: 70px;
+    transform-origin: center center;
+    animation: sspinner 0.9s ease infinite;
+}
+@keyframes sspinner {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loadError {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+.loadError h1 {
+    width: max-content;
+}
+.schedule {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.sc-controls {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+}
+.sc-controls .monthpan {
+    margin-left: 30px;
+    display: flex;
+    gap: 15px;
+    color: rgb(54, 54, 54);
+    align-items: center;
+}
+.sc-controls .monthpan label {
+    font-size: 1.1rem;
+}
+.sc-controls .month-picker {
+    width: 190px;
+    height: 40px;
+}
+.sc-controls .create-event {
+    width: 180px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.95rem;
+}
+.scheduleView {
+    width: 100%;
+    height: fit-content;
+    padding: 0 1px;
+    margin: 0;
+    display: flex;
+    list-style: none;
+}
+
+.scheduleView .day {
+    width: 100%;
+    height: fit-content;
+    margin: 0 1px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 1px 3px 1px rgba(187, 187, 187, 0.763);
+    border-radius: 5px;
+    background-color: white;
+    overflow: hidden;
+}
+.scheduleView .day h3 {
+    margin-top: 5px;
+    margin-bottom: 3px;
+}
+.scheduleView .day h4 {
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color:rgb(91, 143, 255);
+}
+.scheduleView .items {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgb(170, 170, 170);
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.scheduleView .day:nth-child(odd) .items {
+    background-color: rgb(255, 251, 239);
+}
+.item {
+    width: 100%;
+    text-align: center;
+    padding: 5px 5px;
+    border-bottom: 1px solid rgb(207, 207, 207);
+    font-size: 0.97rem;
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    transition: all 0.05s ease;
+    cursor: default;
+    user-select: none;
+}
+.item-hovered {
+    background-color: rgb(133, 255, 177);
+    color: rgb(3, 112, 5);
+    box-shadow: inset 0 0 3px 1px rgba(60, 201, 119, 0.651);
+}
+.item-reserved {
+    background-color: rgb(255, 230, 146);
+    color: rgb(96, 88, 26);
+    box-shadow: inset 0 0 3px 1px rgba(220, 207, 88, 0.651);
+}
+.item-taken {
+    box-shadow: inset 0 0 3px 1px rgba(118, 159, 255, 0.651);
+    background-color: rgb(166, 211, 255);
+    color: rgb(29, 66, 168);
+}
+
+.scheduleView .items .item:last-child {
+    border-bottom: none;
+}

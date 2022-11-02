@@ -3,19 +3,21 @@ import React, {useEffect, useState} from 'react';
 import { motion } from 'framer-motion';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import './profile.css';
-import { ProfileInfo, updateProfile, changePassword, loadProfile } from '../auth/api';
+import { Profile, updateProfile, changePassword, loadProfile } from '../auth/api';
 import { Link } from 'react-router-dom';
 import TextLoading from '../../components/text-loading/text-loading';
 
 
 function ProfilePage() {
-    const [profile, setProfile] = useState({});
+    const [profile, setProfile] = useState<Profile | null>(null);
 
     useEffect(() => {
         loadProfile()
-        .then((data) => {
-            setProfile({name: data.name, email: data.email});
-            setName(data.name);
+        .then((data: Profile | null) => {
+            if (data) {
+                setProfile(data);
+                setName(data.name);
+            }
         })
     }, [])
 
@@ -71,6 +73,10 @@ function ProfilePage() {
             setError(e.response.data.message);
         })
         setStatus('sent')
+    }
+
+    if (!profile) {
+        return (<></>);
     }
 
     const wasNameChanged = name !== profile.name;

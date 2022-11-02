@@ -1,10 +1,10 @@
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 
 // dev
-const ORIGIN = 'http://localhost:8080'
+// const ORIGIN = 'http://localhost:8080'
 
 // prod
-// const ORIGIN = 'https://conferense-hall.fly.dev'
+const ORIGIN = 'https://conferense-hall.fly.dev'
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = ORIGIN;
@@ -47,7 +47,7 @@ export async function refreshSession(): Promise<boolean> {
     let response: {accessToken: string};
     try {
         response = (await axios.post('/auth/refresh')).data;
-    } catch(e) {
+    } catch(e: any) {
         if (e.response.statusText === 'Forbidden') {
             localStorage.removeItem('accessToken');
             return false;
@@ -63,6 +63,26 @@ export async function refreshSession(): Promise<boolean> {
     else {
         localStorage.removeItem('accessToken');
         return false;
+    }
+}
+
+// try async func with fetch, if forbidden, refresh session and try again, if again forbidden redirect on sign-in
+export async function requestPrivate(func: Function) {
+    try { // if accessToken was not expired
+        const response = await func();
+        return response.data;
+    } catch (e: any) { // if it was expired
+        if (e.response.statusText === 'Forbidden') {
+            if (await refreshSession() === true) {
+                const response = await func();
+                return response.data;
+            } else {
+                throw e;
+            }
+        } else {
+            localStorage.removeItem('accessToken')
+            throw e;
+        }
     }
 }
 
@@ -126,40 +146,50 @@ export async function changePassword(oldPassword: string, newPassword: string) {
 
 }
 
-export interface ProfileInfo {
+export interface Profile {
+    id: string;
     name: string;
     email: string;
+    role: string;
 }
 
-export async function loadProfile() {
+export async function loadProfile(redirect=true): Promise<Profile | null> {
     let data;
     try {
         data = await requestPrivate(() => axios.get('/profile', {
             headers: {'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),}
         }));
     } catch(e) {
-        return window.location.replace('/sign-in')
+        if (redirect) {
+            window.location.replace('/sign-in')
+            return null;
+        } else {
+            return null;
+        }
+        
     }
     return data;
 
 }
 
-// try async func with fetch, if forbidden, refresh session and try again, if again forbidden redirect on sign-in
-export async function requestPrivate(func: Function) {
-    try { // if accessToken was not expired
-        const response = await func();
-        return response.data;
-    } catch (e) { // if it was expired
-        if (e.response.statusText === 'Forbidden') {
-            if (await refreshSession() === true) {
-                const response = await func();
-                return response.data;
-            } else {
-                throw e;
-            }
-        } else {
-            localStorage.removeItem('accessToken')
-            throw e;
+export async function logout() {
+    const data = await requestPrivate(() => axios.post('/auth/logout', {}, {
+        headers: {'Authorization': 'Bearer ' + localStorage.getItem('accessToken'),}
+    }));
+    if (data) {
+        localStorage.clear()
+        return true;
+    }    
+
+    return false;
+}
+
+export async function getSchedule(year: number, month: number) {
+    const res = await axios.get('/schedule', {
+        params: {
+            year,
+            month
         }
-    }
+    });
+    return res.data;
 }
